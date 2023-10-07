@@ -24,17 +24,18 @@ Direction directions[] = {
 int countOccurrences(char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE], int matrix_rows, int matrix_columns, const char *word, Direction direction) {
     int count = 0;
     int wordLength = strlen(word);
+    int row, col, i; /* Declare loop variables outside for loops */
 
-    // Iterate through the matrix
-    for (int row = 0; row < matrix_rows; row++) {
-        for (int col = 0; col < matrix_columns; col++) {
+    /* Iterate through the matrix */ 
+    for (row = 0; row < matrix_rows; row++) {
+        for (col = 0; col < matrix_columns; col++) {
             if (matrix[row][col] == word[0]) {
                 int matchLength = 1;
                 int newRow = row;
                 int newCol = col;
                 
-                // Try to match the rest of the word
-                for (int i = 1; i < wordLength; i++) {
+                /* Try to match the rest of the word */ 
+                for (i = 1; i < wordLength; i++) {
                     newRow += direction.dx;
                     newCol += direction.dy;
                     if (newRow < 0 || newRow >= matrix_rows || newCol < 0 || newCol >= matrix_columns) {
@@ -56,16 +57,16 @@ int countOccurrences(char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE], int matrix_r
 }
 
 int findStartPosition(char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE], int matrix_rows, int matrix_columns, const char *word, Direction direction, int *startRow, int *startCol) {
-    int wordLength = strlen(word);
+    int wordLength = strlen(word), row, col, i;
 
-    for (int row = 0; row < matrix_rows; row++) {
-        for (int col = 0; col < matrix_columns; col++) {
+    for (row = 0; row < matrix_rows; row++) {
+        for (col = 0; col < matrix_columns; col++) {
             if (matrix[row][col] == word[0]) {
                 int matchLength = 1;
                 int newRow = row;
                 int newCol = col;
                 
-                for (int i = 1; i < wordLength; i++) {
+                for (i = 1; i < wordLength; i++) {
                     newRow += direction.dx;
                     newCol += direction.dy;
                     if (newRow < 0 || newRow >= matrix_rows || newCol < 0 || newCol >= matrix_columns) {
@@ -90,46 +91,49 @@ int findStartPosition(char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE], int matrix_
 
 char solutionMatrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE];
 
-void clearSolutionMatrix() {
-    for (int i = 0; i < MAX_MATRIX_SIZE; i++) {
-        for (int j = 0; j < MAX_MATRIX_SIZE; j++) {
+void clearSolutionMatrix(void) {
+    int i, j; /* Declare loop variables outside for loop */
+    for (i = 0; i < MAX_MATRIX_SIZE; i++) {
+        for (j = 0; j < MAX_MATRIX_SIZE; j++) {
             solutionMatrix[i][j] = ' ';
         }
     }
 }
 
 void placeWordInSolutionMatrix(int row, int col, const char *word, Direction direction) {
-    for (int i = 0; word[i] != '\0'; i++) {
+    int i; /* Declare loop variable outside for loop */
+    for (i = 0; word[i] != '\0'; i++) {
         solutionMatrix[row][col] = word[i];
         row += direction.dx;
         col += direction.dy;
     }
 }
 
-int main() {
+int main(void) {
     char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE] = {0};
     int matrix_rows = 0;
     int matrix_columns = 0;
     char line[MAX_WORD_LENGTH];
     int isMatrix = 1;
+    int i, j, dir; /* Declare loop variables outside for loops */
 
-    // Reading matrix and words from stdin
-    clearSolutionMatrix();  // Clear the solution matrix once, before processing words.
+    /* Reading matrix and words from stdin */ 
+    clearSolutionMatrix();  /* Clear the solution matrix once, before processing words. */ 
 
-    // Reading matrix and words from stdin
+    /* Reading matrix and words from stdin */ 
     while (fgets(line, sizeof(line), stdin)) {
-        // Remove newline character
+        /* Remove newline character */ 
         line[strcspn(line, "\n")] = 0;
 
         if (isMatrix) {
             int col = 0;
-            for (int i = 0; line[i] != '\0'; i++) {
+            for (i = 0; line[i] != '\0'; i++) {
                 if (line[i] != ' ') {
                     matrix[matrix_rows][col++] = line[i];
                 }
             }
             
-            if (matrix_columns == 0) {  // Only set matrix_columns once.
+            if (matrix_columns == 0) {  /* Only set matrix_columns once. */ 
                 matrix_columns = col;
             }
             
@@ -142,13 +146,10 @@ int main() {
 
 
         if (!isMatrix) {
-            // printf("%s\n", line);
-
             if (strlen(line) >= 2) {
-                for (int dir = 0; dir < 8; dir++) {
+                for (dir = 0; dir < 8; dir++) {
                     int count = countOccurrences(matrix, matrix_rows, matrix_columns, line, directions[dir]);
                     if (count > 0) {
-                        // printf("Occurrences of \"%s\" moving %s: %d\n", line, directions[dir].description, count);
                         int startRow, startCol;
                         if (findStartPosition(matrix, matrix_rows, matrix_columns, line, directions[dir], &startRow, &startCol)) {
                             placeWordInSolutionMatrix(startRow, startCol, line, directions[dir]);
@@ -158,18 +159,18 @@ int main() {
             }
         }
     }
-    // Print solution matrix
-    for (int i = 0; i < matrix_rows; i++) {
-        for (int j = 0; j < matrix_columns; j++) {
+    /* Print solution matrix */ 
+    for (i = 0; i < matrix_rows; i++) {
+        for (j = 0; j < matrix_columns; j++) {
             printf("%c", solutionMatrix[i][j]);
             
-            // Add space after each character, except the last character in the row
+            /* Add space after each character, except the last character in the row */ 
             if (j < matrix_columns - 1) {
                 printf(" ");
             }
-        }
-        printf("\n");
     }
+    printf("\n");
+}
 
     return 0;
 }
