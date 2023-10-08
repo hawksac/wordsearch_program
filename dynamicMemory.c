@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
-#define MAX_WORD_LENGTH 50
+#define MAX_MATRIX_SIZE 100
+#define MAX_WORD_LENGTH 100
 
 typedef struct {
     int dx;
@@ -21,7 +21,7 @@ Direction directions[] = {
     {-1, 1, "diagonally up to the right"}
 };
 
-int countOccurrences(char **matrix, int matrix_rows, int matrix_columns, const char *word, Direction direction) {
+int countOccurrences(char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE], int matrix_rows, int matrix_columns, const char *word, Direction direction) {
     int count = 0;
     int wordLength = strlen(word);
     int row, col, i; /* Declare loop variables outside for loops */
@@ -56,7 +56,7 @@ int countOccurrences(char **matrix, int matrix_rows, int matrix_columns, const c
     return count;
 }
 
-int findStartPosition(char **matrix, int matrix_rows, int matrix_columns, const char *word, Direction direction, int *startRow, int *startCol) {
+int findStartPosition(char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE], int matrix_rows, int matrix_columns, const char *word, Direction direction, int *startRow, int *startCol) {
     int wordLength = strlen(word), row, col, i;
 
     for (row = 0; row < matrix_rows; row++) {
@@ -89,16 +89,18 @@ int findStartPosition(char **matrix, int matrix_rows, int matrix_columns, const 
     return 0;
 }
 
-void clearSolutionMatrix(char **solutionMatrix, int rows, int cols) {
+char solutionMatrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE];
+
+void clearSolutionMatrix(void) {
     int i, j; /* Declare loop variables outside for loop */
-    for (i = 0; i < rows; i++) {
-        for (j = 0; j < cols; j++) {
+    for (i = 0; i < MAX_MATRIX_SIZE; i++) {
+        for (j = 0; j < MAX_MATRIX_SIZE; j++) {
             solutionMatrix[i][j] = ' ';
         }
     }
 }
 
-void placeWordInSolutionMatrix(char **solutionMatrix, int row, int col, const char *word, Direction direction) {
+void placeWordInSolutionMatrix(int row, int col, const char *word, Direction direction) {
     int i; /* Declare loop variable outside for loop */
     for (i = 0; word[i] != '\0'; i++) {
         solutionMatrix[row][col] = word[i];
@@ -108,30 +110,14 @@ void placeWordInSolutionMatrix(char **solutionMatrix, int row, int col, const ch
 }
 
 int main(void) {
+    char matrix[MAX_MATRIX_SIZE][MAX_MATRIX_SIZE] = {0};
     int matrix_rows = 0;
     int matrix_columns = 0;
     char line[MAX_WORD_LENGTH];
     int isMatrix = 1;
     int i, j, dir;
 
-    /* Dynamically allocate memory */ 
-    char **matrix = (char **)malloc(MAX_WORD_LENGTH * sizeof(char *));
-    char **solutionMatrix = (char **)malloc(MAX_WORD_LENGTH * sizeof(char *));
-    if (!matrix || !solutionMatrix) {
-        fprintf(stderr, "Failed to allocate memory!\n");
-        return -1;
-    }
-
-    for (i = 0; i < MAX_WORD_LENGTH; i++) {
-        matrix[i] = (char *)malloc(MAX_WORD_LENGTH * sizeof(char));
-        solutionMatrix[i] = (char *)malloc(MAX_WORD_LENGTH * sizeof(char));
-        if (!matrix[i] || !solutionMatrix[i]) {
-            fprintf(stderr, "Failed to allocate memory!\n");
-            return -1;
-        }
-        memset(matrix[i], 0, MAX_WORD_LENGTH);
-        memset(solutionMatrix[i], ' ', MAX_WORD_LENGTH); 
-    }
+    clearSolutionMatrix();  /* Clear the solution matrix once, before processing words. */ 
 
     /* Reading matrix and words from stdin */ 
     while (fgets(line, sizeof(line), stdin)) {
@@ -160,6 +146,7 @@ int main(void) {
             }
         }
 
+
         if (!isMatrix) {
             if (strlen(line) >= 2) {
                 for (dir = 0; dir < 8; dir++) {
@@ -167,34 +154,24 @@ int main(void) {
                     if (count > 0) {
                         int startRow, startCol;
                         if (findStartPosition(matrix, matrix_rows, matrix_columns, line, directions[dir], &startRow, &startCol)) {
-                            placeWordInSolutionMatrix(solutionMatrix, startRow, startCol, line, directions[dir]);
+                            placeWordInSolutionMatrix(startRow, startCol, line, directions[dir]);
                         }
                     }
                 }
             }
         }
     }
-
     /* Print solution matrix */ 
-    for (i = 0; i < matrix_rows; i++) {
-        for (j = 0; j < matrix_columns; j++) {
-            if (j < matrix_columns - 1) {
-                printf("%c ", solutionMatrix[i][j]);
-            } else { 
-                printf("%c", solutionMatrix[i][j]);
-            }
+   for (i = 0; i < matrix_rows; i++) {
+    for (j = 0; j < matrix_columns; j++) {
+        if (j < matrix_columns - 1) {
+            printf("%c ", solutionMatrix[i][j]);
+        } else { 
+            printf("%c", solutionMatrix[i][j]);
         }
-        printf("\n");
     }
-
-    /* Free Memory */
-    for (i = 0; i < MAX_WORD_LENGTH; i++) {
-        free(matrix[i]);
-        free(solutionMatrix[i]);
-    }
-
-    free(matrix);
-    free(solutionMatrix);
+    printf("\n");
+}
 
     return 0;
 }
