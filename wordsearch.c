@@ -24,7 +24,7 @@ Direction directions[] = {
 int countOccurrences(char **matrix, int matrix_rows, int matrix_columns, const char *word, Direction direction) {
     int count = 0;
     int wordLength = strlen(word);
-    int row, col, i; /* Declare loop variables outside for loops */
+    int row, col, i;
 
     /* Iterate through the matrix */ 
     for (row = 0; row < matrix_rows; row++) {
@@ -90,7 +90,7 @@ int findStartPosition(char **matrix, int matrix_rows, int matrix_columns, const 
 }
 
 void clearSolutionMatrix(char **solutionMatrix, int rows, int cols) {
-    int i, j; /* Declare loop variables outside for loop */
+    int i, j;
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++) {
             solutionMatrix[i][j] = ' ';
@@ -99,7 +99,7 @@ void clearSolutionMatrix(char **solutionMatrix, int rows, int cols) {
 }
 
 void placeWordInSolutionMatrix(char **solutionMatrix, int row, int col, const char *word, Direction direction) {
-    int i; /* Declare loop variable outside for loop */
+    int i;
     for (i = 0; word[i] != '\0'; i++) {
         solutionMatrix[row][col] = word[i];
         row += direction.dx;
@@ -177,10 +177,17 @@ int main(void) {
 
     /* Print solution matrix */ 
     for (i = 0; i < matrix_rows; i++) {
-        for (j = 0; j < matrix_columns; j++) {
-            if (j < matrix_columns - 1) {
+        int lastCharIndex = matrix_columns - 1;
+        
+        /* Find the last non-space character in the row */ 
+        while (lastCharIndex >= 0 && solutionMatrix[i][lastCharIndex] == ' ') {
+            lastCharIndex--;
+        }
+
+        for (j = 0; j <= lastCharIndex; j++) {
+            if (j < lastCharIndex) {
                 printf("%c ", solutionMatrix[i][j]);
-            } else { 
+            } else {
                 printf("%c", solutionMatrix[i][j]);
             }
         }
